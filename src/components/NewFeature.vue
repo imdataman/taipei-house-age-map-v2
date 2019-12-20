@@ -18,7 +18,7 @@
 
 <script>
 import { EventBus } from './EventBus';
-import { saveFeature, updateFeature, layer, canEdit } from './sharedMapApi';
+import { saveFeature, updateFeature, canEdit } from './sharedMapApi';
 
 export default {
     name: "NewFeature",
@@ -31,7 +31,6 @@ export default {
         ]
     }),
     created() {
-        window.NewFeature = this;
         EventBus.$on('Map-clickLocate', lngLat => {
             const feature = {
                 type: 'Feature',
@@ -43,8 +42,8 @@ export default {
                 },
             };
             for (const field of this.fields) {
-                feature.properties[field.property] = ''
-            };
+                feature.properties[field.property] = '';
+            }
             this.feature = feature;
             this.mode = 'confirming'
         });
@@ -80,12 +79,10 @@ export default {
                 delete(this.feature.id);
                 if (await updateFeature(this.feature)) {
                     EventBus.$emit('update-feature', this.feature);
-                    console.log('updated', this.feature);
                 } // else error?
             } else {
                 const savedFeature = (await saveFeature(this.feature));
                 EventBus.$emit('NewFeature-saved', savedFeature);
-                console.log('saved', savedFeature);
             }
         },
     },

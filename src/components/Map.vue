@@ -4,7 +4,6 @@
 
 <script>
 import mapboxgl from 'mapbox-gl';
-import U from 'mapbox-gl-utils';
 
 import { EventBus } from './EventBus';
 import { getFeatures, layer } from './sharedMapApi';
@@ -12,58 +11,78 @@ import boundingBox from 'geojson-bounding-box';
 export default {
     data: () => ({
         points: undefined,
-        selectedId: undefined
+        selectedId: undefined,
+        mode: "",
     }),
-    async mounted() {
+    mounted() {
         // replace this Mapbox access token with your own
-        mapboxgl.accessToken = 'pk.eyJ1Ijoic3RldmFnZSIsImEiOiJjazQ2dDMzemcwMnFqM2VvY21rZTJuazl0In0.niqCsX9iAJNdTM9NvdRZ7Q';
+        mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hbmR5bGluMiIsImEiOiJhYzg1YzcyNDNiYWE3MTFiY2QxN2JmNTg1ODQzOTIyZCJ9.5ZxE4iFh-Myp-eKwHk0qwg';
         const map = new mapboxgl.Map({
             container: 'map',
             center: [144.96, -37.81],
             zoom: 14,
             style: 'mapbox://styles/mapbox/light-v9',
         });
-        U.init(map, mapboxgl);
         window.map = map;
-        window.Map = this;
 
-        map.U.onLoad(async () => {
-            map.U.addGeoJSON('points');
-            map.U.addCircle('points-circles', 'points', {
-                circleColor: 'hsl(330,100%,70%)',
-                circleStrokeColor: 'hsl(330,100%,40%)',
-                // circleStrokeWidth: 3,
-                circleStrokeWidth: ['case',
-                    ['to-boolean', ["feature-state", "selected"]], 8,
-                    3],
+        map.on("load", async () => {
+            map.addSource('points', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+            map.addLayer({
+                'id': 'points-circles',
+                'type': 'circle',
+                'source': 'points',
+                'paint': {
+                    'circle-stroke-color': 'hsl(330,100%,40%)',
+                    'circle-stroke-width': ['case',
+                        ['to-boolean', ["feature-state", "selected"]], 8, 3],
 
-                circleRadius: { stops: [[10,3], [12, 10]] }
+                    'circle-radius': { 'stops': [[10,3], [12, 10]] },
+                    'circle-color': 'hsl(330,100%,70%)'
+                }
             });
-            map.U.addSymbol('points-labels', 'points', {
-                textField: '{name}',
-                textColor: 'hsl(330,100%,30%)',
-                textAnchor: 'left',
-                textOffset: [1,0]
+            map.addLayer({
+                'id': 'points-labels',
+                'type': 'symbol',
+                'source': 'points',
+                'layout': {
+                    'text-field': ['get', 'name'],
+                    'text-anchor': 'left',
+                    'text-offset': [1,0]
+                },
+                'paint': {
+                    'text-color': 'hsl(330,100%,30%)',
+                }
             });
-            map.U.addGeoJSON('new-point');
-            map.U.addCircle('new-point-circle', 'new-point', {
-                circleColor: 'transparent',
-                circleStrokeColor: 'hsl(120,80%,30%)',
-                circleStrokeWidth: 5,
-                circleRadius: { stops: [[10,3], [12, 10]] }
+            map.addSource('new-point', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+            map.addLayer({
+                'id': 'new-point-circle',
+                'type': 'circle',
+                'source': 'new-point',
+                'paint': {
+                    'circle-stroke-color': 'hsl(120,80%,30%)',
+                    'circle-stroke-width': 5,
+                    'circle-radius': { 'stops': [[10,3], [12, 10]] },
+                    'circle-color': 'transparent'
+                }
             });
             
-            map.U.hoverPointer('points-circles');
+            map.on('mouseenter', 'points-circles', () => map.getCanvas().style.cursor = 'pointer' ); 
+            map.on('mouseleave', 'points-circles', () => map.getCanvas().style.cursor = '' ); 
             map.on('click', 'points-circles', e => {
-                if (NewFeature.mode === '') {
-                    console.log(e);
-                    window.FeatureInfo.feature = e.features[0];
+                if (this.mode === '') {
+                    EventBus.$emit('circle-clicked', e.features[0]);
                 }
             });
             map.on('click', e => {
-                if (window.NewFeature.mode === 'locating') {
+                if (this.mode === 'locating') {
                     EventBus.$emit('Map-clickLocate', e.lngLat);
-                    map.U.setData('new-point', {
+                    map.getSource('new-point').setData({
                         type: 'Point',
                         coordinates: [e.lngLat.lng, e.lngLat.lat]
                     });
@@ -71,28 +90,29 @@ export default {
             });
 
             EventBus.$on('NewFeature-mode', mode => {
+                this.mode = mode;
                 if (mode === 'locating') {
                     map.getCanvas().style.cursor = 'crosshair'
 
                 } else if (mode === '') {
                     map.getCanvas().style.cursor = ''
 
-                    map.U.setData('new-point', { type: 'FeatureCollection', features: []});
+                    map.getSource('new-point').setData({ type: 'FeatureCollection', features: []});
                 } else {
                     map.getCanvas().style.cursor = ''
                 }
             });
             EventBus.$on('NewFeature-saved', newFeature => {
                 this.points.features.push(newFeature);
-                map.U.setData('points', this.points);
+                map.getSource('points').setData(this.points);
             });
             EventBus.$on('delete-feature', id => {
                 this.points.features = this.points.features.filter(f => f.id !== id);
-                map.U.setData('points', this.points);
+                map.getSource('points').setData(this.points);
             });        
             EventBus.$on('update-feature', feature => {
                 Object.assign(this.points.features.find(f => f.id === feature._id), feature);
-                map.U.setData('points', this.points);
+                map.getSource('points').setData(this.points);
             });        
             EventBus.$on('select-feature', feature => {
                 if (this.selectedId) {
@@ -109,7 +129,7 @@ export default {
                 if (this.points) {
                     map.fitBounds(boundingBox(this.points), { padding: 60 });
                 }
-                map.U.setData('points', this.points);
+                map.getSource('points').setData(this.points);
             }
         });
 

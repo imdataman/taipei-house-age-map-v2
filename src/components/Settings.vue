@@ -34,21 +34,16 @@
 
 <script>
 import URI from 'urijs';
-import { getPointsGeoJSONUrl, getPointsCsvUrl } from './sharedMapApi';
+import { layer, secretkey, getPointsGeoJSONUrl, getPointsCsvUrl } from './sharedMapApi';
 export default {
     name: "Settings",
     data: () => ({
         newLayer: '',
-        newSecretKey: ''
+        newSecretKey: '',
+        layer: layer,
+        secretkey: secretkey,
     }),
-    created() {
-        window.Settings = this;
-    },
     computed:{
-        
-        layer: () => (window.location.search.match(/layer=([a-zA-Z0-9_-]+)/) || [])[1],
-        secretkey: () => (window.location.search.match(/secretkey=([a-zA-Z0-9_-]+)/) || [])[1],
-
         readOnlyUrl: () => new URI(window.location).removeQuery('secretkey').toString(),
         collaborationUrl: () => new URI(window.location).toString(),
         csvUrl: () => getPointsCsvUrl,
@@ -70,15 +65,6 @@ export default {
 input {
     width: calc(100% - 1em);
 }
-
-.collapsed #Settings {
-    /* display: none; */
-}
-
-.collapsed #Settings * {
-    /* display: none; */
-}
-
 
 /* #newLayer::placeholder */
 

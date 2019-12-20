@@ -5,7 +5,6 @@ export const secretkey = (window.location.search.match(/secretkey=([a-zA-Z0-9_-]
 export const canEdit = () => !!secretkey;
 
 const keyFragment = secretkey ? `?key=${secretkey}` : '';
-console.log(layer);
 
 export const getPointsUrl = `https://shared-map-api.glitch.me/layer/${layer}${keyFragment}`;
 export const getPointsGeoJSONUrl = `https://shared-map-api.glitch.me/layer/${layer}.geojson`;
