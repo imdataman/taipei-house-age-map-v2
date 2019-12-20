@@ -4,24 +4,8 @@
     p To create your own map, just choose these two parameters.
     .list.pl0.measure.center
         template(v-for="item in listItem")
-            a.db.link.pv3.ba.br1.bg-white.mb1.tc.pointer.hover-orange(@click="choosed=item"
-            :class="{ active: choosed==item }") {{ item }}
-    
-    //-
-        label.b.f5.mb0 Layer
-        p.dark-gray.f7.i.mv0 A unique string identifying your map.
-
-        button.mv2.mr2.f6.link.dim.ph3.pv2.mb2.dib.white.bg-purple(@click="clickCreate") Create My Map
-        template
-            p.lh-copy.f7.dark-gray Download as 
-                a.underline.link.dim.black(:href="geoJSONUrl") GeoJSON
-                |  or 
-                a.underline.link.dim.black(:href="csvUrl") CSV
-                | .
-
-            button.mt4.mb2.mr2.f6.link.dim.ph3.pv2.dib.white.bg-blue(@click="clickNew") Start over with new map
-
-
+            a.db.link.pv3.ba.br1.bg-white.mb1.tc.pointer.hover-orange(@click="chooseDataset(item)"
+            :class="{active: item==choosed}") {{ item }}
 </template>
 
 <script>
@@ -41,7 +25,10 @@ export default {
     },
     methods: {
         chooseDataset(item) {
-            return `Item ${item} clicked`;
+            if(item != this.choosed) {
+                this.choosed = item;
+                console.log(`Item ${item} clicked`);
+            }
         }
     }
 }
