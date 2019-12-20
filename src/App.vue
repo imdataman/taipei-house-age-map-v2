@@ -12,7 +12,6 @@
 
                 Settings
                 FeatureInfo.pa2
-                NewFeature.pa2
             #sidebar-rim.relative.br.bg-light-gray.b--gray.shadow-4.z-1(v-show="!sidebarOpen"  style="width:20px" @click="sidebarOpen = true")
             #map-container.relative.flex-auto
                 Map
@@ -21,8 +20,6 @@
                     .icono-caretRight.ml0
                   span(v-if="sidebarOpen") 
                     .icono-caretLeft.ml0
-
-                #overlay.absolute
         #bottom.bt.b--light-gray.flex-none.lh-solid.pa1.bg-washed-blue(v-show="sidebarOpen")
             p.ma0
                 b Disclaimer: 
@@ -36,7 +33,6 @@
 <script>
 import Map from './components/Map.vue'
 import FeatureInfo from './components/FeatureInfo.vue'
-import NewFeature from './components/NewFeature.vue'
 import Settings from './components/Settings.vue'
 import { EventBus } from './components/EventBus';
 
@@ -45,7 +41,6 @@ export default {
     components: {
       Map,
       FeatureInfo,
-      NewFeature,
       Settings
     },
     data: () => ({
@@ -111,7 +106,7 @@ html, body {
 }
 
 #sidebarToggle:hover {
-  background:hsl(333,100%,95%)
+  background: #ff8f47;
 }
 
 .collapsed * {

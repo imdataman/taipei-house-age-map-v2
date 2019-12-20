@@ -19,7 +19,7 @@ export default {
         mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hbmR5bGluMiIsImEiOiJhYzg1YzcyNDNiYWE3MTFiY2QxN2JmNTg1ODQzOTIyZCJ9.5ZxE4iFh-Myp-eKwHk0qwg';
         const map = new mapboxgl.Map({
             container: 'map',
-            center: [144.96, -37.81],
+            center: [103.849, 1.343],
             zoom: 14,
             style: 'mapbox://styles/mapbox/light-v9',
         });
