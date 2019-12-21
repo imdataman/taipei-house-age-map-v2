@@ -25,7 +25,7 @@
         #bottom.bt.b--light-gray.flex-none.lh-solid.ph2.pt3.pb1bg-washed-blue.tc(v-show="sidebarOpen")
             p.ma0
                 b 資料來源: 
-                | 社會經濟資料庫
+                | 社會經濟資料庫，2019年10月
             p 製作 
                 a(href="https://twitter.com/stevage1") 林佳賢
                 | .  
