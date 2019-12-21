@@ -1,33 +1,45 @@
 <template lang="pug">
-#Settings.pa2.mb3.bg-light-blue
-    h4 Welcome to TinyMap. 
-    p To create your own map, just choose these two parameters.
+#Settings.pa2.mb3
+    h4.tc.mv3.f3-l 請選擇資料
     .list.pl0.measure.center
         template(v-for="item in listItem")
-            a.db.link.pv3.ba.br1.bg-white.mb1.tc.pointer.hover-orange(@click="chooseDataset(item)"
-            :class="{active: item==choosed}") {{ item }}
+            a.db.link.pv3.ba.br1.bg-white.mb1.tc.pointer.hover-orange.f3-l(@click="chooseTheme(item)"
+            :class="{active: item.name==choosed.name}") {{ item.name }}
 </template>
 
 <script>
-import URI from 'urijs';
-import { getPointsGeoJSONUrl, getPointsCsvUrl } from './sharedMapApi';
+import { EventBus } from './EventBus';
+
 export default {
     name: "Settings",
     data: () => ({
-        listItem: ['1', '2', '3', '4'],
-        choosed: "1",
+        listItem: [{
+                name: '人口密度',
+                type: 'P_DEN'
+            },
+            {
+                name: '性別比例',
+                type: 'M_F_RAT'
+            },
+            {
+                name: '家戶平均人口',
+                type: 'P_H_CNT'
+            },
+            {
+                name: '老化指數',
+                type: 'FLD4'
+            }
+        ],
+        choosed: {
+            name: '人口密度',
+            type: 'P_DEN'
+        },
     }),
-    computed:{
-        readOnlyUrl: () => new URI(window.location).removeQuery('secretkey').toString(),
-        collaborationUrl: () => new URI(window.location).toString(),
-        csvUrl: () => getPointsCsvUrl,
-        geoJSONUrl: () => getPointsGeoJSONUrl,
-    },
     methods: {
-        chooseDataset(item) {
-            if(item != this.choosed) {
+        chooseTheme(item) {
+            if(item.type != this.choosed.type) {
                 this.choosed = item;
-                console.log(`Item ${item} clicked`);
+                EventBus.$emit('change-theme', item);
             }
         }
     }
