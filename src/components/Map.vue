@@ -52,6 +52,18 @@ export default {
             const townBoundary = topojson.feature(town, town.objects.town);
             const villageBoundary = topojson.feature(village, village.objects.village);
 
+            villageBoundary.features.forEach( f => {
+                f.id = f.properties.ID.substring(0, 8) + f.properties.ID.substring(9);
+            });
+
+            countyBoundary.features.forEach( f => {
+                f.id = f.properties.ID;
+            });
+
+            townBoundary.features.forEach( f => {
+                f.id = f.properties.ID;
+            });
+
             map.addSource('county', {
                 'type': 'geojson',
                 'data': countyBoundary
@@ -77,6 +89,43 @@ export default {
                         ],
                         'rgba(0, 0, 0, 1)',
                         'rgba(0, 0, 0, 0)'
+                    ],
+                }
+            });
+
+            map.addLayer({
+                'id': 'countyBorder',
+                'source': 'county',
+                'minzoom': zoomThreshold[0],
+                'maxzoom': zoomThreshold[1],
+                'type': 'line',
+                'paint': {
+                    'line-color': "#000",
+                    'line-opacity': 0.8,
+                    'line-width': 1
+                }
+            });
+
+            map.addLayer({
+                'id': 'countySelected',
+                'source': 'county',
+                'maxzoom': zoomThreshold[0],
+                'type': 'line',
+                'paint': {
+                    'line-color': [
+                        'case',
+                        ['boolean',
+                            ['feature-state', 'hover'],
+                            false
+                        ],
+                        'rgba(0, 0, 0, 1)',
+                        'rgba(0, 0, 0, 0)'
+                    ],
+                    'line-width': [
+                        'interpolate', ['linear'],
+                        ['zoom'],
+                        6, 2,
+                        zoomThreshold[0], 3
                     ],
                 }
             });
@@ -111,6 +160,43 @@ export default {
                 }
             });
 
+            map.addLayer({
+                'id': 'townBorder',
+                'source': 'town',
+                'minzoom': zoomThreshold[1],
+                'type': 'line',
+                'paint': {
+                    'line-color': "#000",
+                    'line-opacity': 0.8,
+                    'line-width': 1
+                }
+            });
+
+            map.addLayer({
+                'id': 'townSelected',
+                'source': 'town',
+                'minzoom': zoomThreshold[0],
+                'maxzoom': zoomThreshold[1],
+                'type': 'line',
+                'paint': {
+                    'line-color': [
+                        'case',
+                        ['boolean',
+                            ['feature-state', 'hover'],
+                            false
+                        ],
+                        'rgba(0, 0, 0, 1)',
+                        'rgba(0, 0, 0, 0)'
+                    ],
+                    'line-width': [
+                        'interpolate', ['linear'],
+                        ['zoom'],
+                        zoomThreshold[0], 3,
+                        zoomThreshold[1], 6
+                    ]
+                }
+            });
+
             map.addSource('village', {
                 'type': 'geojson',
                 'data': villageBoundary
@@ -140,6 +226,30 @@ export default {
                 }
             });
 
+            map.addLayer({
+                'id': 'villageSelected',
+                'source': 'village',
+                'minzoom': zoomThreshold[1],
+                'type': 'line',
+                'paint': {
+                    'line-color': [
+                        'case',
+                        ['boolean',
+                            ['feature-state', 'hover'],
+                            false
+                        ],
+                        'rgba(0, 0, 0, 1)',
+                        'rgba(0, 0, 0, 0)'
+                    ],
+                    'line-width': [
+                        'interpolate', ['linear'],
+                        ['zoom'],
+                        zoomThreshold[1], 6,
+                        16, 10
+                    ]
+                }
+            });
+
             EventBus.$emit('loading-finished');
 
             map.on('click', 'countyPolygon', e => {
@@ -156,6 +266,16 @@ export default {
 
             EventBus.$on('change-theme', theme => {
                 this.theme = theme.type;
+            });
+
+            EventBus.$on('select-feature', feature => {
+                if (this.selectedId) {
+                    let source = this.selectedId.toString().length == 5 ? "county" : this.selectedId.toString().length == 8 ? "town" : "village";
+                    map.setFeatureState({ source: source, id: this.selectedId }, { hover: false });
+                }
+                this.selectedId = feature.id;
+                let source = this.selectedId.toString().length == 5 ? "county" : this.selectedId.toString().length == 8 ? "town" : "village";
+                map.setFeatureState({ source: source, id: this.selectedId }, { hover: true });
             });
 
             map.on('mousemove', "countyPolygon", () => map.getCanvas().style.cursor = 'pointer' );

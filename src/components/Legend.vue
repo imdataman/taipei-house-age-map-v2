@@ -25,7 +25,6 @@ export default {
     },
     created() {
         EventBus.$on('feature-clicked', feature => {
-            EventBus.$emit('select-feature', feature);
             this.feature = feature;
         });
 
