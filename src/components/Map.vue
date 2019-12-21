@@ -144,8 +144,8 @@ export default {
                 'paint': {
                     'fill-color': [
                         'step',
-                        ['get', 'P_DEN'],
-                        "#bdbdbd", 1, "#f7fbff", 250, "#deebf7", 500, "#c6dbef", 1000, "#9ecae1", 2500, "#6baed6", 5000, "#4292c6", 10000, "#2171b5", 25000, "#084594"
+                        ['get', this.theme],
+                        this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
                     ],
                     'fill-opacity': 0.8,
                     'fill-outline-color': [
@@ -210,8 +210,8 @@ export default {
                 'paint': {
                     'fill-color': [
                         'step',
-                        ['get', 'P_DEN'],
-                        "#bdbdbd", 1, "#f7fbff", 500, "#deebf7", 1000, "#c6dbef", 2500, "#9ecae1", 5000, "#6baed6", 10000, "#4292c6", 25000, "#2171b5", 50000, "#084594"
+                        ['get', this.theme],
+                        this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
                     ],
                     'fill-opacity': 0.8,
                     'fill-outline-color': [
