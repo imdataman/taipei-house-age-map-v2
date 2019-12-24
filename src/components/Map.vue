@@ -159,6 +159,14 @@ export default {
                             [15, 48]
                         ]
                     },
+                },
+                "paint": {
+                    "text-opacity": {
+                        stops: [
+                            [11.5, 0.8],
+                            [15, 0]
+                        ]
+                    },
                 }
             });
 
