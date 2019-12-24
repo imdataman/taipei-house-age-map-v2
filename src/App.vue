@@ -6,7 +6,7 @@
                 | 台北屋齡地圖
         #middle.flex.flex-auto
             #sidebar.br.b--light-gray.overflow-auto.shadow-4.z-1.bg-washed-blue(:class="{ collapsed: !sidebarOpen}")
-                #mobile-header.bg-washed-yellow.ma0.pa1
+                #mobile-header.bg-washed-green.ma0.pa1
                     img.logo.f5.mh1.mv2.fl(src="image/logo.jpg")
                     h1.f3.mv2 台北屋齡地圖
                 AgeInfo(:legend = 'legend')
