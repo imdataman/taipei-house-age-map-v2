@@ -5,19 +5,17 @@
 <script>
 import mapboxgl from 'mapbox-gl';
 import * as request from 'd3-fetch';
-import * as topojson from "topojson-client";
 import { EventBus } from './EventBus';
+import circle from '@turf/circle';
+import bbox from '@turf/bbox';
+import distance from '@turf/distance';
 export default {
     data: () => ({
-        selectedId: undefined,
-        theme: "P_DEN",
-        map: {},
     }),
     props: {
-        selectedLegend: Object
+        legend: Object
     },
-    async mounted() {
-        const zoomThreshold = [9, 12];
+    mounted() {
         const blankStyle = {
             "version": 8,
             "name": "Blank",
@@ -34,285 +32,170 @@ export default {
             "id": "blank",
             "glyphs": "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf"
         };
+        const center = [121.5561, 25.07337];
+
+        const radius = 0.5;
+        const options = { steps: 36, units: 'kilometers' };
+
         const map = new mapboxgl.Map({
             container: 'map',
-            center: [120.973882, 23.57565],
-            zoom: 6.5,
             style: blankStyle,
+            center: center,
+            zoom: 11.5,
+            maxZoom: 15,
+            minZoom: 11.5,
         });
         window.map = map;
-        this.map = map;
 
         map.on("load", async () => {
-            const county = await request.json('data/county.json');
-            const town = await request.json('data/town.json');
-            const village = await request.json('data/village.json');
+            let points = {
+                type: "FeatureCollection"
+            };
 
-            const countyBoundary = topojson.feature(county, county.objects.county);
-            const townBoundary = topojson.feature(town, town.objects.town);
-            const villageBoundary = topojson.feature(village, village.objects.village);
-
-            villageBoundary.features.forEach( f => {
-                f.id = f.properties.ID.substring(0, 8) + f.properties.ID.substring(9);
+            await request.csv("data/housing_age.csv").then(data => {
+                points.features = data.map(d => {
+                    return {
+                        type: "Feature",
+                        geometry: {
+                            type: "Point",
+                            coordinates: [+d.long, +d.lat]
+                        },
+                        properties: {
+                            age: +d.age
+                        }
+                    };
+                })
             });
 
-            countyBoundary.features.forEach( f => {
-                f.id = f.properties.ID;
-            });
-
-            townBoundary.features.forEach( f => {
-                f.id = f.properties.ID;
-            });
-
-            map.addSource('county', {
+            map.addSource('road', {
                 'type': 'geojson',
-                'data': countyBoundary
+                'data': 'data/road.geojson'
             });
 
             map.addLayer({
-                'id': 'countyPolygon',
-                'source': 'county',
-                'maxzoom': zoomThreshold[0],
-                'type': 'fill',
-                'paint': {
-                    'fill-color': [
-                        'step',
-                        ['get', this.theme],
-                        this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                    ],
-                    'fill-opacity': 0.8,
-                    'fill-outline-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'selected'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
-                    ],
-                }
-            });
-
-            map.addLayer({
-                'id': 'countyBorder',
-                'source': 'county',
-                'minzoom': zoomThreshold[0],
-                'maxzoom': zoomThreshold[1],
+                'id': 'roadLine',
+                'source': 'road',
                 'type': 'line',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
                 'paint': {
-                    'line-color': "#000",
-                    'line-opacity': 0.8,
-                    'line-width': 1
-                }
-            });
-
-            map.addLayer({
-                'id': 'countySelected',
-                'source': 'county',
-                'maxzoom': zoomThreshold[0],
-                'type': 'line',
-                'paint': {
-                    'line-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'hover'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
-                    ],
+                    'line-color': '#ccc',
                     'line-width': [
-                        'interpolate', ['linear'],
-                        ['zoom'],
-                        6, 2,
-                        zoomThreshold[0], 3
-                    ],
-                }
-            });
-            
-            map.addSource('town', {
-                'type': 'geojson',
-                'data': townBoundary
-            });
-
-            map.addLayer({
-                'id': 'townPolygon',
-                'source': 'town',
-                'minzoom': zoomThreshold[0],
-                'maxzoom': zoomThreshold[1],
-                'type': 'fill',
-                'paint': {
-                    'fill-color': [
-                        'step',
-                        ['get', this.theme],
-                        this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                    ],
-                    'fill-opacity': 0.8,
-                    'fill-outline-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'selected'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
-                    ],
-                }
-            });
-
-            map.addLayer({
-                'id': 'townBorder',
-                'source': 'town',
-                'minzoom': zoomThreshold[1],
-                'type': 'line',
-                'paint': {
-                    'line-color': "#000",
-                    'line-opacity': 0.8,
-                    'line-width': 1
-                }
-            });
-
-            map.addLayer({
-                'id': 'townSelected',
-                'source': 'town',
-                'minzoom': zoomThreshold[0],
-                'maxzoom': zoomThreshold[1],
-                'type': 'line',
-                'paint': {
-                    'line-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'hover'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
-                    ],
-                    'line-width': [
-                        'interpolate', ['linear'],
-                        ['zoom'],
-                        zoomThreshold[0], 3,
-                        zoomThreshold[1], 6
+                        "case", 
+                        ['==', ['get', "highway"], "primary"], 2, 
+                        ['==', ['get', "highway"], "secondary"], 1,
+                        0.5
                     ]
                 }
             });
 
-            map.addSource('village', {
-                'type': 'geojson',
-                'data': villageBoundary
-            });
-
-            map.addLayer({
-                'id': 'villagePolygon',
-                'source': 'village',
-                'minzoom': zoomThreshold[1],
-                'type': 'fill',
-                'paint': {
-                    'fill-color': [
-                        'step',
-                        ['get', this.theme],
-                        this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                    ],
-                    'fill-opacity': 0.8,
-                    'fill-outline-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'selected'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
-                    ],
+            map.addSource('circle', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: []
                 }
             });
 
             map.addLayer({
-                'id': 'villageSelected',
-                'source': 'village',
-                'minzoom': zoomThreshold[1],
+                id: 'circlePolygon',
                 'type': 'line',
+                'source': 'circle',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
                 'paint': {
-                    'line-color': [
-                        'case',
-                        ['boolean',
-                            ['feature-state', 'hover'],
-                            false
-                        ],
-                        'rgba(0, 0, 0, 1)',
-                        'rgba(0, 0, 0, 0)'
+                    'line-color': 'black',
+                    'line-width': 2
+                }
+            });
+
+            map.addSource('points', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: []
+                },
+                buffer: 0,
+            });
+
+            map.addLayer({
+                id: 'allPoints',
+                'type': 'circle',
+                'source': 'points',
+                'paint': {
+                    'circle-radius': {
+                        stops: [
+                            [11.5, 0.8],
+                            [15, 2.5]
+                        ]
+                    },
+                    'circle-color': [
+                        'step',
+                        ['get', 'age'],
+                        this.legend.palette[0], this.legend.breaks[1], this.legend.palette[1], this.legend.breaks[2], this.legend.palette[2], this.legend.breaks[3], this.legend.palette[3], this.legend.breaks[4], this.legend.palette[4], this.legend.breaks[5], this.legend.palette[5], this.legend.breaks[6], this.legend.palette[6], this.legend.breaks[7], this.legend.palette[7]
                     ],
-                    'line-width': [
-                        'interpolate', ['linear'],
-                        ['zoom'],
-                        zoomThreshold[1], 6,
-                        16, 10
-                    ]
                 }
             });
 
-            EventBus.$emit('loading-finished');
-
-            map.on('click', 'countyPolygon', e => {
-                EventBus.$emit('feature-clicked', e.features[0]);
+            map.addSource('townLabel', {
+                'type': 'geojson',
+                'data': 'data/town-label.geojson'
             });
 
-            map.on('click', 'townPolygon', e => {
-                EventBus.$emit('feature-clicked', e.features[0]);
-            });
-
-            map.on('click', 'villagePolygon', e => {
-                EventBus.$emit('feature-clicked', e.features[0]);
-            });
-
-            EventBus.$on('change-theme', theme => {
-                this.theme = theme.type;
-            });
-
-            EventBus.$on('select-feature', feature => {
-                if (this.selectedId) {
-                    let source = this.selectedId.toString().length == 5 ? "county" : this.selectedId.toString().length == 8 ? "town" : "village";
-                    map.setFeatureState({ source: source, id: this.selectedId }, { hover: false });
+            map.addLayer({
+                'id': 'townText',
+                'source': 'townLabel',
+                'type': 'symbol',
+                "layout": {
+                    "symbol-placement": "point",
+                    "text-field": "{TOWNNAME}",
+                    "text-size": {
+                        stops: [
+                            [11.5, 16],
+                            [15, 48]
+                        ]
+                    },
                 }
-                this.selectedId = feature.id;
-                let source = this.selectedId.toString().length == 5 ? "county" : this.selectedId.toString().length == 8 ? "town" : "village";
-                map.setFeatureState({ source: source, id: this.selectedId }, { hover: true });
             });
 
-            map.on('mousemove', "countyPolygon", () => map.getCanvas().style.cursor = 'pointer' );
-            map.on('mousemove', "townPolygon", () => map.getCanvas().style.cursor = 'pointer' );
-            map.on('mousemove', "villagePolygon", () => map.getCanvas().style.cursor = 'pointer' );
-            map.on('mouseleave', "countyPolygon", () => map.getCanvas().style.cursor = '' );
-            map.on('mouseleave', "townPolygon", () => map.getCanvas().style.cursor = '' );
-            map.on('mouseleave', "villagePolygon", () => map.getCanvas().style.cursor = '' );
+            map.getSource("points").setData(points);
+
+            map.once('styledata', () => {
+                EventBus.$emit('loading-finished');
+            });
+
+            const randomArray = Array.from({length: 10000}, () => Math.floor(Math.random() * points.features.length));
+
+            const visibleFeatures = points.features.filter((f, i) => {
+                return randomArray.includes(i);
+            })
+
+            let selectedFeatures = [];
+
+            const pointsDistacne = (pointsArray, point) => pointsArray.filter((p) => distance(p, point, { units: 'kilometers' }) < radius);
+
+            map.on('mousemove', e => {
+                const center = [e.lngLat.lng, e.lngLat.lat]
+                const circlePolygon = circle(center, radius, options);
+                map.getSource("circle").setData(circlePolygon);
+
+                const bboxPolygon = bbox(circlePolygon);
+
+                selectedFeatures = visibleFeatures.filter(p => p.geometry.coordinates[0] > bboxPolygon[0] && p.geometry.coordinates[0] < bboxPolygon[2] && p.geometry.coordinates[1] > bboxPolygon[1] && p.geometry.coordinates[1] < bboxPolygon[3]);
+
+                const ptsWithin = pointsDistacne(selectedFeatures, center);
+
+                EventBus.$emit('select-feature', ptsWithin);
+            });
         });
 
-    },
-    watch: {
-        selectedLegend() {
-            this.map.setPaintProperty(
-                'countyPolygon',
-                'fill-color',
-                ['step',['get', this.selectedLegend.type],
-                this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                ]
-            );
-            this.map.setPaintProperty(
-                'townPolygon',
-                'fill-color',
-                ['step',['get', this.selectedLegend.type],
-                this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                ]
-            );
-            this.map.setPaintProperty(
-                'villagePolygon',
-                'fill-color',
-                ['step',['get', this.selectedLegend.type],
-                this.selectedLegend.palette[0], this.selectedLegend.breaks[1], this.selectedLegend.palette[1], this.selectedLegend.breaks[2], this.selectedLegend.palette[2], this.selectedLegend.breaks[3], this.selectedLegend.palette[3], this.selectedLegend.breaks[4], this.selectedLegend.palette[4], this.selectedLegend.breaks[5], this.selectedLegend.palette[5], this.selectedLegend.breaks[6], this.selectedLegend.palette[6], this.selectedLegend.breaks[7], this.selectedLegend.palette[7]
-                ]
-            );
-        }
     }
 }
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 </script>

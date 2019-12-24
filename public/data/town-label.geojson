@@ -1,0 +1,19 @@
+{
+"type": "FeatureCollection",
+"name": "town_label",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "TOWNNAME": "大安區" }, "geometry": { "type": "Point", "coordinates": [ 121.543424173273024, 25.026864519491195 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "文山區" }, "geometry": { "type": "Point", "coordinates": [ 121.545843285665725, 24.998703110577942 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "信義區" }, "geometry": { "type": "Point", "coordinates": [ 121.571651691513082, 25.03075410130521 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "萬華區" }, "geometry": { "type": "Point", "coordinates": [ 121.497347572786367, 25.029367981391349 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "中正區" }, "geometry": { "type": "Point", "coordinates": [ 121.519848436533053, 25.032456915713805 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "南港區" }, "geometry": { "type": "Point", "coordinates": [ 121.606525560186043, 25.056386233536937 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "松山區" }, "geometry": { "type": "Point", "coordinates": [ 121.560111844517451, 25.05538182712414 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "大同區" }, "geometry": { "type": "Point", "coordinates": [ 121.513207466727096, 25.064005160801578 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "中山區" }, "geometry": { "type": "Point", "coordinates": [ 121.53362323776193, 25.058359311851891 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "內湖區" }, "geometry": { "type": "Point", "coordinates": [ 121.592398158702764, 25.08378217432033 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "士林區" }, "geometry": { "type": "Point", "coordinates": [ 121.52228469449355, 25.104977006706676 ] } },
+{ "type": "Feature", "properties": { "TOWNNAME": "北投區" }, "geometry": { "type": "Point", "coordinates": [ 121.502805501761387, 25.129633876282341 ] } }
+]
+}
