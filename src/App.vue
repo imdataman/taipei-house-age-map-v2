@@ -110,10 +110,6 @@ html, body {
   animation-fill-mode: forwards;
 }
 
-#sidebarToggle:hover {
-  background: #;
-}
-
 .collapsed * {
     display: none;
     /* margin-left: -100px; */
