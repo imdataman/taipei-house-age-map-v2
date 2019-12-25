@@ -4,7 +4,7 @@
             #sidebar.overflow-auto.bg-dark-blue.tc(:class="{ collapsed: !sidebarOpen}")
                 #mobile-header.pt4.pb3-l.pt5-l
                     p.f2-l.f3 台北屋齡地圖
-                AgeInfo.pb2.pt1.pb5-l.pt3-l(:legend = 'legend')
+                AgeInfo.pb3.pt1.pb5-l.pt3-l(:legend = 'legend')
                 Legend.pa2(:legend = 'legend')
             #map-container.relative.flex-auto
                 Map(:legend = 'legend')
