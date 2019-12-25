@@ -2,14 +2,14 @@
     #app.flex.flex-column.vh-100
         #middle.flex.flex-auto
             #sidebar.overflow-auto.bg-dark-blue.tc(:class="{ collapsed: !sidebarOpen}")
-                #mobile-header.pt4
-                    p.f2-l.f3.mt4 台北屋齡地圖
-                AgeInfo.mb4-l(:legend = 'legend')
+                #mobile-header.pt4.pb3-l.pt5-l
+                    p.f2-l.f3 台北屋齡地圖
+                AgeInfo.pb2.pt1.pb5-l.pt3-l(:legend = 'legend')
                 Legend.pa2(:legend = 'legend')
             #map-container.relative.flex-auto
                 Map(:legend = 'legend')
                 img.absolute(class="loading" src="image/loading.gif" v-show="!loading")
-                #sidebarToggle.absolute.bg-black.f5.br.bt.bb.br--right.br-100.b--black.bw1.mt6.magenta.pointer.grow.pa1-l.pl1(@click="sidebarOpen = !sidebarOpen")
+                #sidebarToggle.absolute.bg-black.f5.br.bt.bb.br--right.br-100.b--black.bw1.mt2.magenta.pointer.grow.pa1-l.pl1(@click="sidebarOpen = !sidebarOpen")
                   span(v-if="!sidebarOpen")
                     .icono-caretRight.ml0
                   span(v-if="sidebarOpen") 
@@ -67,17 +67,17 @@ html, body {
   margin:0;
   padding:0;
   color: white;
-  font-family: PingFangTC-Ultralight, sans-serif;
+  font-family: PingFangTC-Ultralight, SimHei, sans-serif;
 }
 
 @media (min-width: 800px) {
     #sidebar {
-        width: 20rem;
+        width: 20em;
     }
 }
 @media only screen and (max-width: 800px) {
     #sidebar {
-        width: 10rem;
+        width: 10em;
     }
     
     #mobile-header .logo {

@@ -1,6 +1,6 @@
 <template lang="pug">
-#Settings.pa2.mb3
-    p.tc.mb3.mt4.f3-l.f5 {{"平均屋齡：" + (mean || " - ") + "年" }}
+#Settings
+    p.tc.f3-l.f5.pt2 {{"平均屋齡：" + (mean || " - ") + " 年" }}
 </template>
 
 <script>
