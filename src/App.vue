@@ -67,7 +67,7 @@ html, body {
   margin:0;
   padding:0;
   color: white;
-  font-family: PingFangTC-Ultralight, SimHei, sans-serif;
+  font-family: PingFangTC-Ultralight, Microsoft JhengHei UI, sans-serif;
 }
 
 @media (min-width: 800px) {
