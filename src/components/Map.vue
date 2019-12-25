@@ -84,8 +84,8 @@ export default {
                     'line-color': '#ccc',
                     'line-width': [
                         "case", 
-                        ['==', ['get', "highway"], "primary"], 2, 
-                        ['==', ['get', "highway"], "secondary"], 1,
+                        ['==', ['get', "highway"], "primary"], 1, 
+                        ['==', ['get', "highway"], "secondary"], 0.75,
                         0.5
                     ]
                 }
@@ -129,8 +129,8 @@ export default {
                 'paint': {
                     'circle-radius': {
                         stops: [
-                            [11.5, 0.8],
-                            [15, 2.5]
+                            [11.5, 0.5],
+                            [15, 2]
                         ]
                     },
                     'circle-color': [
