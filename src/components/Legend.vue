@@ -1,9 +1,9 @@
 <template lang="pug">
-#Legend.ph2.pt3.pb2.b--black.ba.pa2.bg-white.ma2
+#Legend.tc
     template(v-for="(color, index) in legend.palette")
-        div.flex.pl4-l
-            div.ba.br1.mb2(:style="{ backgroundColor: color, width: '30px' , height: '30px'}")
-            p.flex-auto.mv2.tl.ml3 {{legend.breaks[index].toString() + " - " + legend.breaks[index + 1].toString() + "年"}}
+        div.flex.pl5-l.pr3-l.pl3.center
+            div.mb2(:style="{ backgroundColor: color}" class="legend")
+            p.flex-auto.mv2.tl.ml3.f7 {{legend.breaks[index].toString() + " - " + legend.breaks[index + 1].toString() + "年"}}
 </template>
 <script>
 export default {
@@ -15,6 +15,17 @@ export default {
     },
 }
 </script>
-
 <style scoped>
+@media (min-width: 800px) {
+    .legend {
+        width: 30px;
+        height: 30px;
+    }
+}
+@media only screen and (max-width: 800px) {
+    .legend {
+        width: 20px;
+        height: 20px;
+    }
+}
 </style>
